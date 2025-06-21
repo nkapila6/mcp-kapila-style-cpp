@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/nkapila6/Code/cpp-mcp/build/cmake_install.cmake",
-		"/Users/nkapila6/Code/cpp-mcp/build/src/cmake_install.cmake",
-		"/Users/nkapila6/Code/cpp-mcp/build/examples/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
