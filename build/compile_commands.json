@@ -1,0 +1,62 @@
+[
+{
+  "directory": "/Users/nkapila6/Code/cpp-mcp/build/src",
+  "command": "/usr/bin/c++  -I/Users/nkapila6/Code/cpp-mcp/include -I/Users/nkapila6/Code/cpp-mcp/common -O3 -DNDEBUG -std=gnu++17 -arch arm64 -o CMakeFiles/mcp.dir/mcp_message.cpp.o -c /Users/nkapila6/Code/cpp-mcp/src/mcp_message.cpp",
+  "file": "/Users/nkapila6/Code/cpp-mcp/src/mcp_message.cpp",
+  "output": "src/CMakeFiles/mcp.dir/mcp_message.cpp.o"
+},
+{
+  "directory": "/Users/nkapila6/Code/cpp-mcp/build/src",
+  "command": "/usr/bin/c++  -I/Users/nkapila6/Code/cpp-mcp/include -I/Users/nkapila6/Code/cpp-mcp/common -O3 -DNDEBUG -std=gnu++17 -arch arm64 -o CMakeFiles/mcp.dir/mcp_resource.cpp.o -c /Users/nkapila6/Code/cpp-mcp/src/mcp_resource.cpp",
+  "file": "/Users/nkapila6/Code/cpp-mcp/src/mcp_resource.cpp",
+  "output": "src/CMakeFiles/mcp.dir/mcp_resource.cpp.o"
+},
+{
+  "directory": "/Users/nkapila6/Code/cpp-mcp/build/src",
+  "command": "/usr/bin/c++  -I/Users/nkapila6/Code/cpp-mcp/include -I/Users/nkapila6/Code/cpp-mcp/common -O3 -DNDEBUG -std=gnu++17 -arch arm64 -o CMakeFiles/mcp.dir/mcp_server.cpp.o -c /Users/nkapila6/Code/cpp-mcp/src/mcp_server.cpp",
+  "file": "/Users/nkapila6/Code/cpp-mcp/src/mcp_server.cpp",
+  "output": "src/CMakeFiles/mcp.dir/mcp_server.cpp.o"
+},
+{
+  "directory": "/Users/nkapila6/Code/cpp-mcp/build/src",
+  "command": "/usr/bin/c++  -I/Users/nkapila6/Code/cpp-mcp/include -I/Users/nkapila6/Code/cpp-mcp/common -O3 -DNDEBUG -std=gnu++17 -arch arm64 -o CMakeFiles/mcp.dir/mcp_tool.cpp.o -c /Users/nkapila6/Code/cpp-mcp/src/mcp_tool.cpp",
+  "file": "/Users/nkapila6/Code/cpp-mcp/src/mcp_tool.cpp",
+  "output": "src/CMakeFiles/mcp.dir/mcp_tool.cpp.o"
+},
+{
+  "directory": "/Users/nkapila6/Code/cpp-mcp/build/src",
+  "command": "/usr/bin/c++  -I/Users/nkapila6/Code/cpp-mcp/include -I/Users/nkapila6/Code/cpp-mcp/common -O3 -DNDEBUG -std=gnu++17 -arch arm64 -o CMakeFiles/mcp.dir/mcp_stdio_client.cpp.o -c /Users/nkapila6/Code/cpp-mcp/src/mcp_stdio_client.cpp",
+  "file": "/Users/nkapila6/Code/cpp-mcp/src/mcp_stdio_client.cpp",
+  "output": "src/CMakeFiles/mcp.dir/mcp_stdio_client.cpp.o"
+},
+{
+  "directory": "/Users/nkapila6/Code/cpp-mcp/build/src",
+  "command": "/usr/bin/c++  -I/Users/nkapila6/Code/cpp-mcp/include -I/Users/nkapila6/Code/cpp-mcp/common -O3 -DNDEBUG -std=gnu++17 -arch arm64 -o CMakeFiles/mcp.dir/mcp_sse_client.cpp.o -c /Users/nkapila6/Code/cpp-mcp/src/mcp_sse_client.cpp",
+  "file": "/Users/nkapila6/Code/cpp-mcp/src/mcp_sse_client.cpp",
+  "output": "src/CMakeFiles/mcp.dir/mcp_sse_client.cpp.o"
+},
+{
+  "directory": "/Users/nkapila6/Code/cpp-mcp/build/examples",
+  "command": "/usr/bin/c++  -I/Users/nkapila6/Code/cpp-mcp/include -I/Users/nkapila6/Code/cpp-mcp/common -I/Users/nkapila6/Code/cpp-mcp/examples -O3 -DNDEBUG -std=gnu++17 -arch arm64 -o CMakeFiles/sse_client_example.dir/sse_client_example.cpp.o -c /Users/nkapila6/Code/cpp-mcp/examples/sse_client_example.cpp",
+  "file": "/Users/nkapila6/Code/cpp-mcp/examples/sse_client_example.cpp",
+  "output": "examples/CMakeFiles/sse_client_example.dir/sse_client_example.cpp.o"
+},
+{
+  "directory": "/Users/nkapila6/Code/cpp-mcp/build/examples",
+  "command": "/usr/bin/c++  -I/Users/nkapila6/Code/cpp-mcp/include -I/Users/nkapila6/Code/cpp-mcp/common -I/Users/nkapila6/Code/cpp-mcp/examples -O3 -DNDEBUG -std=gnu++17 -arch arm64 -o CMakeFiles/stdio_client_example.dir/stdio_client_example.cpp.o -c /Users/nkapila6/Code/cpp-mcp/examples/stdio_client_example.cpp",
+  "file": "/Users/nkapila6/Code/cpp-mcp/examples/stdio_client_example.cpp",
+  "output": "examples/CMakeFiles/stdio_client_example.dir/stdio_client_example.cpp.o"
+},
+{
+  "directory": "/Users/nkapila6/Code/cpp-mcp/build/examples",
+  "command": "/usr/bin/c++  -I/Users/nkapila6/Code/cpp-mcp/include -I/Users/nkapila6/Code/cpp-mcp/common -I/Users/nkapila6/Code/cpp-mcp/examples -O3 -DNDEBUG -std=gnu++17 -arch arm64 -o CMakeFiles/server_example.dir/server_example.cpp.o -c /Users/nkapila6/Code/cpp-mcp/examples/server_example.cpp",
+  "file": "/Users/nkapila6/Code/cpp-mcp/examples/server_example.cpp",
+  "output": "examples/CMakeFiles/server_example.dir/server_example.cpp.o"
+},
+{
+  "directory": "/Users/nkapila6/Code/cpp-mcp/build/examples",
+  "command": "/usr/bin/c++  -I/Users/nkapila6/Code/cpp-mcp/include -I/Users/nkapila6/Code/cpp-mcp/common -I/Users/nkapila6/Code/cpp-mcp/examples -O3 -DNDEBUG -std=gnu++17 -arch arm64 -o CMakeFiles/agent_example.dir/agent_example.cpp.o -c /Users/nkapila6/Code/cpp-mcp/examples/agent_example.cpp",
+  "file": "/Users/nkapila6/Code/cpp-mcp/examples/agent_example.cpp",
+  "output": "examples/CMakeFiles/agent_example.dir/agent_example.cpp.o"
+}
+]

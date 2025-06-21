@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmcp.a CMakeFiles/mcp.dir/mcp_message.cpp.o CMakeFiles/mcp.dir/mcp_resource.cpp.o CMakeFiles/mcp.dir/mcp_server.cpp.o CMakeFiles/mcp.dir/mcp_tool.cpp.o CMakeFiles/mcp.dir/mcp_stdio_client.cpp.o CMakeFiles/mcp.dir/mcp_sse_client.cpp.o
+/usr/bin/ranlib libmcp.a
