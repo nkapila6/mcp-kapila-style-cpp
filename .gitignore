@@ -33,3 +33,17 @@
 
 # macOS
 .DS_Store
+
+# Credentials and config (important!)
+config.json
+*.env
+secrets/
+.env
+
+# Dependencies downloaded by CPM
+_deps/
+
+# Build directories
+build/
+build-*/
+cmake-build-*/
