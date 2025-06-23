@@ -51,11 +51,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Eigen3)
 
-# Add MCP library
 add_subdirectory(src)
-
-# Add examples
-add_subdirectory(examples)
+# add_subdirectory(examples)
+add_subdirectory(apps)
+add_subdirectory(apps_testing)
 
 # Add test directory
 option(MCP_BUILD_TESTS "Build the tests" OFF)

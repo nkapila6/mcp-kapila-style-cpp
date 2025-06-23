@@ -1,5 +1,9 @@
 set(TARGET mcp)
 
+# adding utils
+file(GLOB UTILS_SOURCES "utils/*.cpp")
+file(GLOB UTILS_HEADERS "../include/utils/*.h")
+
 add_library(${TARGET} STATIC
     ../include/mcp_client.h
     mcp_message.cpp
@@ -14,6 +18,8 @@ add_library(${TARGET} STATIC
     ../include/mcp_stdio_client.h
     mcp_sse_client.cpp
     ../include/mcp_sse_client.h
+    ${UTILS_SOURCES}
+    ${UTILS_HEADERS}
 )
 
 target_link_libraries(${TARGET} PUBLIC ${CMAKE_THREAD_LIBS_INIT})
