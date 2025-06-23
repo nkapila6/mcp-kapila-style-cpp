@@ -23,6 +23,7 @@ add_library(${TARGET} STATIC
 )
 
 target_link_libraries(${TARGET} PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(${TARGET} PUBLIC Eigen3::Eigen)
 
 # If OpenSSL is found, link the OpenSSL libraries
 if(OPENSSL_FOUND)
