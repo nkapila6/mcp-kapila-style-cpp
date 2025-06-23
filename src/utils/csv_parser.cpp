@@ -134,7 +134,7 @@ namespace csv{
             const auto& row = dataset[i];
             
             json << "    {\n";
-            json << "      \"index\": " << i << ",\n";
+            // json << "      \"index\": " << i << ",\n";
             json << "      \"id\": " << row.id << ",\n";
             // json << "      \"filename\": \"" << row.fname << "\",\n";
             json << "      \"description\": \"" << row.desc << "\",\n";

@@ -31,14 +31,17 @@ int main(){
     std::cout << "The query is " << query << std::endl;
 
     auto top_data = csv::get_top_k(dataset);
-    for (const auto& row : top_data) {
-        std::cout << "ID: " << row.id 
-                << ", File: " << row.fname 
-                << ", Score: " << row.score << std::endl
-                << ", Desc: " << row.desc << std::endl
-                << "Link: " << row.link << std::endl
-                << std::endl;
-    }
+    // for (const auto& row : top_data) {
+    //     std::cout << "ID: " << row.id 
+    //             << ", File: " << row.fname 
+    //             << ", Score: " << row.score << std::endl
+    //             << ", Desc: " << row.desc << std::endl
+    //             << "Link: " << row.link << std::endl
+    //             << std::endl;
+    // }
+
+    std::string json = csv::dataset_to_json(top_data);
+    std::cout << json;
 
     return 0;
 }
