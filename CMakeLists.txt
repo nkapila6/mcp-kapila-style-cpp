@@ -34,13 +34,22 @@ option(MCP_SSL "Enable SSL support" OFF)
 
 if(MCP_SSL)
     find_package(OpenSSL 3.0.0 COMPONENTS Crypto SSL REQUIRED)
-    include_directories(${OPENSSL_INCLUDE_DIR}) # before including cpp-httplib to avoid OpenSSL with lower version included 
+    include_directories(${OPENSSL_INCLUDE_DIR}) # before including cpp-httplib to avoid OpenSSL with lower version included
     message(STATUS "OpenSSL include directory: ${OPENSSL_INCLUDE_DIR}")
     add_compile_definitions(MCP_SSL CPPHTTPLIB_OPENSSL_SUPPORT)
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
+
+# including Eigen
+include(FetchContent)
+FetchContent_Declare(
+    Eigen3
+    GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+    GIT_TAG 3.4.0
+)
+FetchContent_MakeAvailable(Eigen3)
 
 # Add MCP library
 add_subdirectory(src)

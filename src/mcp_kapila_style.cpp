@@ -3,11 +3,11 @@
  * @brief MCP Server for Couchbase and Replicate APIs
  * @author Nikhil Kapila
  * @date 2025-06-22 00:03:35 Sunday
- * @version 1.0.0 
- * 
+ * @version 1.0.0
+ *
  * This example demonstrates how to create an MCP server, register tools and resources,
  * and handle client requests. Follows the 2024-11-05 basic protocol specification.
- * 
+ *
  * Tools provided:
  * TBA
  */
@@ -30,13 +30,13 @@ ollama::response ollama_embedder(const std::string& text){
 }
 
 // couchbase vector search
-mcp::json couchbase_vector_searcher(const mcp::json &params){
+mcp::json couchbase_vector_searcher(const mcp::json& params){
 
 }
 
 // inference using replicate
 mcp::json replicate_inference(const mcp::json &params){
-    
+
 }
 
 // TODO: need to add image resource
@@ -61,6 +61,6 @@ int main () {
     std::cout << "Starting MCP server at localhost:8888..." << std::endl;
     std::cout << "Press Ctrl+C to stop the server" << std::endl;
     server.start(true);  // Blocking mode
-    
+
     return 0;
 }
