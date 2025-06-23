@@ -58,6 +58,20 @@ namespace csv {
    std::vector<double> parse_str_to_vector(const std::string& vec_str);
 
    /**
+   * @brief Converts a row to a string
+   * @param row a row in the dataset
+   * @return returns a string with all the row info for the LLM
+   */
+   std::string row_to_string(const CSVRow& row);
+
+    /**
+    * @brief Converts dataset to a json string
+    * @param dataset the incoming dataset (most likely going to be a subset from the get_top_k func)
+    * @return returns a json string
+    */
+    std::string dataset_to_json(const std::vector<CSVRow>& dataset);
+
+   /**
    * @brief Gets top-k sorted results
    * @param dataset loaded full dataset
    * @param k number of results to return

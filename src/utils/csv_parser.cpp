@@ -112,6 +112,51 @@ namespace csv{
         return result;
     }
 
+    std::string row_to_string(const CSVRow& row){
+        std::stringstream stream;
+    
+        stream << "ID: " << row.id << "\n"
+            << "File: " << row.fname << "\n"
+            << "Description: " << row.desc << "\n"
+            << "Score: " << row.score << "\n"
+            << "Link: " << row.link << "\n";
+    
+        return stream.str();
+    }
+
+    std::string dataset_to_json(const std::vector<CSVRow>& dataset) {
+        std::stringstream json;
+        
+        json << "{\n";
+        json << "  \"results\": [\n";
+        
+        for (size_t i = 0; i < dataset.size(); ++i) {
+            const auto& row = dataset[i];
+            
+            json << "    {\n";
+            json << "      \"index\": " << i << ",\n";
+            json << "      \"id\": " << row.id << ",\n";
+            // json << "      \"filename\": \"" << row.fname << "\",\n";
+            json << "      \"description\": \"" << row.desc << "\",\n";
+            json << "      \"score\": " << row.score << ",\n";
+            json << "      \"link\": \"" << row.link << "\",\n";
+            // json << "      \"embedding_model\": \"" << row.embedding_model << "\"\n";
+            json << "    }";
+            
+            // Add comma if not the last element
+            if (i < dataset.size() - 1) {
+                json << ",";
+            }
+            json << "\n";
+        }
+        
+        json << "  ],\n";
+        json << "  \"count\": " << dataset.size() << "\n";
+        json << "}";
+        
+        return json.str();
+    }
+
     std::vector<CSVRow> get_top_k(std::vector<CSVRow>& dataset, int k){
         // sorting the dataset
         std::sort(dataset.begin(), dataset.end(),
@@ -120,6 +165,7 @@ namespace csv{
             });
         
         return std::vector<CSVRow>(dataset.begin(), dataset.begin()+k);
+        // TODO: Throw an error when `get_top_k` can return no matches
    }
 
 }
