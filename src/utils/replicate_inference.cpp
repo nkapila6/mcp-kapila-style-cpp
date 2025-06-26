@@ -97,9 +97,18 @@ namespace ri{
         if (result->status != 200) {
             return "Error: HTTP " + std::to_string(result->status) + " - " + result->body;
         }
-    
-        return result->body;
 
+        std::string jsonresp = result->body;
+        std::cout << "Returned response:\n" << jsonresp;
+
+        nlohmann::json res = nlohmann::json::parse(jsonresp);
+
+        if (res.contains("status")){
+            if (res["status"] == "succeeded"){
+                return res["output"];
+            }
+        } else {
+            return "Parsing failed. Returning raw response.\n" + jsonresp;
+        }
     }
-
 }
