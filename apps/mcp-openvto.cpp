@@ -43,7 +43,9 @@ struct Config{
     std::string version;
 
     // local file path for csv
-    std::string filepath;
+    std::string csv_filepath;
+    // local file path for base image
+    std::string img_filepath;
 } config;
 
 static Config parse_config(int argc, char* argv[]) {
@@ -121,11 +123,18 @@ static Config parse_config(int argc, char* argv[]) {
                 std::cerr << "Error: --version requires a value" << std::endl;
                 exit(1);
             }
-        } else if (strcmp(argv[i], "--filepath") == 0) {
+        } else if (strcmp(argv[i], "--csv-filepath") == 0) {
             if (i + 1 < argc) {
-                config.filepath = argv[++i];
+                config.csv_filepath = argv[++i];
             } else {
-                std::cerr << "Error: --filepath requires a value" << std::endl;
+                std::cerr << "Error: --csv_filepath requires a value" << std::endl;
+                exit(1);
+            }
+        } else if (strcmp(argv[i], "--img-filepath") == 0) {
+            if (i + 1 < argc) {
+                config.img_filepath = argv[++i];
+            } else {
+                std::cerr << "Error: --img-filepath requires a value" << std::endl;
                 exit(1);
             }
         } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
@@ -133,8 +142,8 @@ static Config parse_config(int argc, char* argv[]) {
             std::cout << "Couchbase Options:\n";
             std::cout << "  --user <username>        Couchbase username\n";
             std::cout << "  --pass <password>        Couchbase password\n";
-            std::cout << "  --hostname <hostname>    Couchbase hostname (default: localhost)\n";
-            std::cout << "  --port <port>            Couchbase port (default: 11210)\n";
+            std::cout << "  --hostname <hostname>    Couchbase hostname\n";
+            std::cout << "  --port <port>            Couchbase port (default: 18094)\n";
             std::cout << "  --bucket <bucket>        Couchbase bucket name\n";
             std::cout << "  --scope <scope>          Couchbase scope name\n";
             std::cout << "  --search-index <index>   Couchbase search index name\n\n";
@@ -142,7 +151,8 @@ static Config parse_config(int argc, char* argv[]) {
             std::cout << "  --api-key <key>          Replicate API key\n";
             std::cout << "  --version <version>      Replicate model version\n\n";
             std::cout << "File Options:\n";
-            std::cout << "  --filepath <path>        Path to CSV file\n\n";
+            std::cout << "  --csv_filepath <path>        Path to CSV file\n\n";
+            std::cout << "  --img_filepath <path>        Path to base img file\n\n";
             std::cout << "Other Options:\n";
             std::cout << "  --help, -h               Show this help message\n";
             exit(0);
