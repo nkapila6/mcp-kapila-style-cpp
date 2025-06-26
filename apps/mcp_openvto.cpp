@@ -9,16 +9,19 @@
  *
  */
 
+// mcp requirements
 #include "mcp_server.h"
 #include "mcp_tool.h"
-#include "mcp_resource.h"
 
+// standard headers
 #include <iostream>
-#include <chrono>
-#include <ctime>
-#include <thread>
-#include <filesystem>
-#include <algorithm>
+#include <ostream>
+#include <stdexcept>
+#include <string>
+
+// 3rd party headers
+#include <Eigen/Dense>
+#include "ollama.hpp"
 
 // utils
 #include "utils/csv_parser.h"
@@ -35,6 +38,7 @@ struct Config{
     std::string bucket;
     std::string scope;
     std::string search_index;
+    std::string search_field;
 
     // replicate configs
     std::string api_key;
@@ -115,6 +119,13 @@ static Config parse_config(int argc, char* argv[]) {
                 std::cerr << "Error: --search-index requires a value" << std::endl;
                 exit(1);
             }
+        } else if (strcmp(argv[i], "--search-field") == 0) {
+            if (i + 1 < argc) {
+                config.search_field = argv[++i];
+            } else {
+                std::cerr << "Error: --search-field requires a value" << std::endl;
+                exit(1);
+            }
         } else if (strcmp(argv[i], "--api-key") == 0) {
             if (i + 1 < argc) {
                 config.api_key = argv[++i];
@@ -153,6 +164,7 @@ static Config parse_config(int argc, char* argv[]) {
             std::cout << "  --bucket <bucket>        Couchbase bucket name\n";
             std::cout << "  --scope <scope>          Couchbase scope name\n";
             std::cout << "  --search-index <index>   Couchbase search index name\n\n";
+            std::cout << "  --search-field <field>   Couchbase search field name\n\n";
             std::cout << "Replicate Options:\n";
             std::cout << "  --api-key <key>          Replicate API key\n";
             std::cout << "  --version <version>      Replicate model version\n\n";
@@ -201,22 +213,66 @@ FunctionalityAvailability eval_availability(const Config& config){
     }
 }
 
+// convert query to embedding
+std::vector<double> fetch_embedding_from_query(std::string& query, bool verbose){
+    if (!ollama::is_running()){
+        throw std::runtime_error("Ollama service is not running. Please start Ollama before using this functionality.");
+    }
+
+    if (verbose){
+        ollama::show_requests(true);
+        ollama::show_replies(true);
+    }
+
+    ollama::response response = ollama::generate_embeddings("nomic-embed-text:latest", query);
+    nlohmann::json data = response.as_json();
+
+    if (verbose){
+        std::cout << data["embeddings"].type_name(); // is array
+        std::cout << "Embeddings: " << data["embeddings"][0] << std::endl;
+    }
+
+    std::vector<double> vec = data["embeddings"][0];
+    // https://stackoverflow.com/questions/43907601/how-to-copy-data-from-c-array-to-eigen-matrix-or-vector
+    // Eigen::RowVectorXd eigen = Eigen::Map<Eigen::RowVectorXd>(vec.data(), vec.size());
+
+    return vec;
+}
+
 // search locally using provided .CSV
-std::string local_search(){
+auto local_search(const Config& config, std::string& query, bool verbose=false){
+    // convert query to embedding
+    std::vector<double> query_vec = fetch_embedding_from_query(query, verbose);
+    // get datset
+    auto dataset = csv::parse_csv_with_scores(config.csv_filepath, query_vec);
 
-
+    return csv::get_top_k(dataset);
 }
 
 // couchbase vector search
-mcp::json couchbase_vector_searcher(const mcp::json& params){
+std::string couchbase_vector_searcher(const mcp::json& params, std::string& query, std::string& field, int k=5, bool verbose=false){
+    std::vector<double> query_vec = fetch_embedding_from_query(query, verbose);
 
+    CouchbaseVectorSearch couchbase(config.user, 
+        config.pass, config.hostname, config.port,
+        config.bucket, config.scope, config.search_index, 
+        query_vec);
+
+    std::string res = couchbase.vector_search(field, k);
+    std::cout << "Received from server:\n" << res << std::endl;
+
+    return res;
 }
 
 // inference using replicate
 mcp::json replicate_inference(const mcp::json& params){
 
 
+
+
 }
+
+
 
 // TODO: need to add image resource
 
@@ -233,6 +289,7 @@ int main(int argc, char* argv[]){
     }
 
 
+
     mcp::server server("localhost", 8888);
     server.set_server_info("MCP OpenVTO in C++", "1.0.0");
 
@@ -246,7 +303,7 @@ int main(int argc, char* argv[]){
         .with_description("")
         .build(); // TODO need to add params
 
-    server.register_tool(style_transfer, replicate_inference);
+    // server.register_tool(style_transfer, replicate_inference);
 
     // Start server
     std::cout << "Starting MCP server at localhost:8888..." << std::endl;
