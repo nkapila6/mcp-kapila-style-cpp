@@ -48,6 +48,9 @@ struct Config{
     std::string csv_filepath;
     // local file path for base image
     std::string img_filepath;
+
+    // verbosity
+    bool verbose;
 } config;
 
 enum FunctionalityAvailability{ //lol@name
@@ -57,6 +60,12 @@ enum FunctionalityAvailability{ //lol@name
     NEEDS_CONFIG,
     ALL
 };
+
+bool parse_bool(const std::string& str) {
+    if (str == "true" || str == "1" || str == "yes") return true;
+    if (str == "false" || str == "0" || str == "no") return false;
+    throw std::invalid_argument("Invalid boolean: " + str);
+}
 
 static Config parse_config(int argc, char* argv[]) {
     Config config;
@@ -154,6 +163,13 @@ static Config parse_config(int argc, char* argv[]) {
                 std::cerr << "Error: --img-filepath requires a value" << std::endl;
                 exit(1);
             }
+        } else if (strcmp(argv[i], "--verbose") == 0) {
+            if (i + 1 < argc) {
+                config.verbose = parse_bool(argv[++i]);
+            } else {
+                std::cerr << "Error: --verbose should be either 0/1 or true/false" << std::endl;
+                exit(1);
+            }
         } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             std::cout << "Usage: " << argv[0] << " [OPTIONS]\n\n";
             std::cout << "Couchbase Options:\n";
@@ -171,6 +187,7 @@ static Config parse_config(int argc, char* argv[]) {
             std::cout << "File Options:\n";
             std::cout << "  --csv_filepath <path>        Path to CSV file\n\n";
             std::cout << "  --img_filepath <path>        Path to base img file\n\n";
+            std::cout << "  --verbose <bool>             Boolean value (0/false or 1/true)\n\n";
             std::cout << "Other Options:\n";
             std::cout << "  --help, -h               Show this help message\n";
             exit(0);
@@ -181,12 +198,6 @@ static Config parse_config(int argc, char* argv[]) {
         }
     }
     return config;
-}
-
-bool parse_bool(const std::string& str) {
-    if (str == "true" || str == "1" || str == "yes") return true;
-    if (str == "false" || str == "0" || str == "no") return false;
-    throw std::invalid_argument("Invalid boolean: " + str);
 }
 
 FunctionalityAvailability eval_availability(const Config& config){
@@ -273,14 +284,8 @@ std::string couchbase_vector_searcher(const mcp::json& params, std::string& quer
 // inference using replicate
 mcp::json replicate_inference(const mcp::json& params){
 
-
-
-
 }
 
-
-
-// TODO: need to add image resource
 
 int main(int argc, char* argv[]){
     // parse config
@@ -290,11 +295,12 @@ int main(int argc, char* argv[]){
     FunctionalityAvailability check = eval_availability(config);
     if (check == FunctionalityAvailability::NEEDS_CONFIG){
         // throw unintialize config error
+        throw std::runtime_error("\nMissing config. Please add either Local or Couchbase config to continue.");
+
     } else if (check == FunctionalityAvailability::NO_REPLICATE_KEY){
         // cannot run server if replicate key is missing
+        throw std::runtime_error("\nApp is unusable with missing Replicate key for idm-vton. If you are able to run this heavy model locally, let me know or contribute for local inference. :-)");
     }
-
-
 
     mcp::server server("localhost", 8888);
     server.set_server_info("MCP OpenVTO in C++", "1.0.0");
