@@ -1,15 +1,12 @@
 /**
- * @file mcp_kapila_style.cpp
- * @brief MCP Server for Couchbase and Replicate APIs
+ * @file mcp_openvto.cpp
+ * @brief MCP Server for Couchbase/Local and Replicate APIs
  * @author Nikhil Kapila
  * @date 2025-06-22 00:03:35 Sunday
  * @version 1.0.0
  *
- * This example demonstrates how to create an MCP server, register tools and resources,
- * and handle client requests. Follows the 2024-11-05 basic protocol specification.
+ * Follows the 2024-11-05 basic protocol specification.
  *
- * Tools provided:
- * TBA
  */
 
 #include "mcp_server.h"
@@ -27,6 +24,7 @@
 #include "utils/csv_parser.h"
 #include "utils/couchbase_search.h"
 #include "utils/replicate_inference.h"
+#include "utils/open_browser.h"
 
 struct Config{
     // couchbase configs
@@ -47,6 +45,14 @@ struct Config{
     // local file path for base image
     std::string img_filepath;
 } config;
+
+enum FunctionalityAvailability{ //lol@name
+    LOCAL,
+    COUCHBASE,
+    NO_REPLICATE_KEY,
+    NEEDS_CONFIG,
+    ALL
+};
 
 static Config parse_config(int argc, char* argv[]) {
     Config config;
@@ -165,14 +171,41 @@ static Config parse_config(int argc, char* argv[]) {
     return config;
 }
 
+FunctionalityAvailability eval_availability(const Config& config){
+    bool has_couchbase = !config.user.empty() && 
+                        !config.pass.empty() && 
+                        !config.hostname.empty() && 
+                        config.port > 0 && 
+                        !config.bucket.empty() && 
+                        !config.scope.empty() && 
+                        !config.search_index.empty();
 
+    bool has_replicate = !config.api_key.empty() && !config.version.empty();
 
-// perform ollama search using ollama.hpp
-ollama::response ollama_embedder(const std::string& text){
-    return ollama::generate_embeddings("nomic-embed-text", text);
+    bool has_local_files = !config.csv_filepath.empty() && !config.img_filepath.empty();
+
+    // unusable if no access to idm-vton
+    if (!has_replicate){
+        return FunctionalityAvailability::NO_REPLICATE_KEY;
+    }
+
+    // if everything available, all gud
+    if (has_couchbase && has_replicate && has_local_files){
+        return FunctionalityAvailability::ALL;
+    } else if (has_couchbase && has_replicate){ // if couchbase and replicate
+        return FunctionalityAvailability::COUCHBASE;
+    } else if (has_local_files && has_replicate){ // if local nad replicate
+        return FunctionalityAvailability::LOCAL;    
+    } else {
+        return FunctionalityAvailability::NEEDS_CONFIG;
+    }
 }
 
+// search locally using provided .CSV
+std::string local_search(){
 
+
+}
 
 // couchbase vector search
 mcp::json couchbase_vector_searcher(const mcp::json& params){
@@ -188,10 +221,20 @@ mcp::json replicate_inference(const mcp::json& params){
 // TODO: need to add image resource
 
 int main(int argc, char* argv[]){
+    // parse config
     config = parse_config(argc, argv);
 
+    // check what's available and make corresponding tools available
+    FunctionalityAvailability check = eval_availability(config);
+    if (check == FunctionalityAvailability::NEEDS_CONFIG){
+        // throw unintialize config error
+    } else if (check == FunctionalityAvailability::NO_REPLICATE_KEY){
+        // cannot run server if replicate key is missing
+    }
+
+
     mcp::server server("localhost", 8888);
-    server.set_server_info("MCP OpenVTO in C++", "0.0.1");
+    server.set_server_info("MCP OpenVTO in C++", "1.0.0");
 
     mcp::json capabilities = {
         {"tools", } // add tools here
