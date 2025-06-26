@@ -5,9 +5,8 @@
 * @date 2025-06-24 21:31:01 Tuesday
 */
 
-#include <iostream>
-#include "httplib.h"
-#include "json.hpp"
+#include <string>
+#include <vector>
 
 class CouchbaseVectorSearch{
 private:
@@ -26,6 +25,5 @@ public:
         const std::string& host, int prt, const std::string& bucket_name,
         const std::string& scope_name, const std::string& idx_name, const std::vector<double>& query);
         
-    std::string performVectorSearch(const std::string& field, int k);
+    std::string vector_search(const std::string& field, int k);
 };
-
