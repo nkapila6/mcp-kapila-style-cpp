@@ -53,4 +53,7 @@ cmake-build-*/
 *.py
 
 # vscode
-.vscode/*
+.vscode/
+local_certs/
+CMakeFiles/
+CMakeFiles/
