@@ -27,11 +27,12 @@ CouchbaseVectorSearch::CouchbaseVectorSearch(const std::string& usr, const std::
       scope_name(scope_name), idx_name(idx_name), query(query) {
 }
 
-std::string CouchbaseVectorSearch::performVectorSearch(const std::string& field, int k=3) { // field to search on Couchbase DB
+std::string CouchbaseVectorSearch::vector_search(const std::string& field, int k=3) { // field to search on Couchbase DB
     std::string base_url = (port == 18094 ? "https://" : "http://") + hostname + ":" + std::to_string(port);
 
-    std::cout << "Connecting to: " << base_url << std::endl;
-    std::cout << "Using credentials: " << username << " / " << password << std::endl;
+    // only for Debugging
+    // std::cout << "Connecting to: " << base_url << std::endl;
+    // std::cout << "Using credentials: " << username << " / " << password << std::endl;
 
     std::cout << "Field: " << field << std::endl;
     std::cout << "K: " << k << std::endl;
@@ -40,7 +41,7 @@ std::string CouchbaseVectorSearch::performVectorSearch(const std::string& field,
     httplib::Client client(base_url);
 
     #ifdef MCP_SSL
-    // Bypass SSL certificate verification
+    // Bypass SSL certificate verification -- Only for the POC demo
     client.enable_server_certificate_verification(false);
     #endif
 
@@ -92,6 +93,7 @@ std::string CouchbaseVectorSearch::performVectorSearch(const std::string& field,
     
     // https://json.nlohmann.me/api/basic_json/dump/#examples
     std::string json_payload = payload.dump();
+    // only for Debugging
     // std::cout << "Generated JSON: " << json_payload << std::endl;
     // return payload.dump(2); // to check payload
 
