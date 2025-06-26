@@ -183,6 +183,12 @@ static Config parse_config(int argc, char* argv[]) {
     return config;
 }
 
+bool parse_bool(const std::string& str) {
+    if (str == "true" || str == "1" || str == "yes") return true;
+    if (str == "false" || str == "0" || str == "no") return false;
+    throw std::invalid_argument("Invalid boolean: " + str);
+}
+
 FunctionalityAvailability eval_availability(const Config& config){
     bool has_couchbase = !config.user.empty() && 
                         !config.pass.empty() && 
