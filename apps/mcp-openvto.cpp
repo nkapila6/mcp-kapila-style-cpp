@@ -15,7 +15,6 @@
 #include "mcp_server.h"
 #include "mcp_tool.h"
 #include "mcp_resource.h"
-#include "ollama.hpp" // for ollama
 
 #include <iostream>
 #include <chrono>
@@ -23,6 +22,13 @@
 #include <thread>
 #include <filesystem>
 #include <algorithm>
+
+// utils
+#include "utils/csv_parser.h"
+#include "utils/couchbase_search.h"
+#include "utils/replicate_inference.h"
+
+
 
 // perform ollama search using ollama.hpp
 ollama::response ollama_embedder(const std::string& text){
