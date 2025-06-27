@@ -89,12 +89,12 @@ namespace ri{
         // std::cout << "Generated JSON: " << json_payload << std::endl;
 
         auto result = client.Post(path, headers, json_payload, "application/json");
-
+        
         if (!result) {
-        return "Error: Failed to connect to server";
+            return "Error: Failed to connect to server";
         }
-    
-        if (result->status != 200) {
+
+        if (result->status!= 200 && result->status!=201){
             return "Error: HTTP " + std::to_string(result->status) + " - " + result->body;
         }
 
