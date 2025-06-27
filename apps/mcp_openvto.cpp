@@ -10,6 +10,7 @@
  */
 
 // mcp requirements
+#include "json.hpp"
 #include "mcp_server.h"
 #include "mcp_tool.h"
 
@@ -261,12 +262,16 @@ auto local_search(std::string& query, bool verbose=false){
     std::vector<double> query_vec = fetch_embedding_from_query(query, verbose);
     // get datset
     auto dataset = csv::parse_csv_with_scores(config.csv_filepath, query_vec);
+    auto res = csv::dataset_to_json(csv::get_top_k(dataset));
 
-    return csv::get_top_k(dataset);
+    nlohmann::json content = nlohmann::json::array();
+    content.push_back(nlohmann::json{{"type", "text"}, {"text", res}});
+
+    return content;
 }
 
 // couchbase vector search
-std::string couchbase_vector_searcher(std::string& query, int k=5, bool verbose=false){
+auto couchbase_vector_searcher(std::string& query, int k=5, bool verbose=false){
     std::vector<double> query_vec = fetch_embedding_from_query(query, verbose);
 
     CouchbaseVectorSearch couchbase(config.user, 
@@ -279,7 +284,10 @@ std::string couchbase_vector_searcher(std::string& query, int k=5, bool verbose=
         std::cout << "Received from server:\n" << res << std::endl;
     }
 
-    return res;
+    nlohmann::json content = nlohmann::json::array();
+    content.push_back(nlohmann::json{{"type", "text"}, {"text", res}});
+
+    return content;
 }
 
 // inference using replicate
@@ -307,7 +315,7 @@ mcp::json local_search_handler(const mcp::json& params, const std::string& sessi
     
     auto results = local_search(query, config.verbose);
     
-    return csv::dataset_to_json(results);
+    return results;
 }
 
 mcp::json couchbase_search_handler(const mcp::json& params, const std::string& session_id){
