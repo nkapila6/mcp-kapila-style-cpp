@@ -283,10 +283,60 @@ std::string couchbase_vector_searcher(std::string& query, int k=5, bool verbose=
 }
 
 // inference using replicate
-mcp::json replicate_inference(const mcp::json& params){
+std::string replicate_inference(std::string& garm_img_link, std::string& garm_des, bool verbose){
+    ri::ReplicateInference styler(config.version);
 
+    styler.add_input("garm_img", garm_img_link);
+    styler.add_input("human_img", config.img_link);
+    styler.add_input("garment_des", garm_des);
+
+    std::string res = styler.perform_inference(config.api_key);
+    return res;
 }
 
+void open_browser(std::string& link){
+    browser::openURL(link);
+}
+
+mcp::json local_search_handler(const mcp::json& params, const std::string& session_id){
+    std::string query = params["query"].get<std::string>();
+    int k = params["k"].get<int>();
+    
+    std::cout << "Session ID: " << session_id << " Received query: " << query << std::endl;
+    std::cout << "Session ID: " << session_id << " Received k: " << k << std::endl;
+    
+    auto results = local_search(query, config.verbose);
+    
+    return csv::dataset_to_json(results);
+}
+
+mcp::json couchbase_search_handler(const mcp::json& params, const std::string& session_id){
+    std::string query = params["query"].get<std::string>();
+    int k = params["k"].get<int>();
+    
+    std::cout << "Session ID: " << session_id << " Received query: " << query << std::endl;
+    std::cout << "Session ID: " << session_id << " Received k: " << k << std::endl;
+    
+    auto results = couchbase_vector_searcher(query, k, config.verbose);
+    
+    return results;
+}
+
+mcp::json replicate_handler(const mcp::json& params, const std::string& session_id){
+    std::cout << "Session ID: " << session_id << "\t Starting Replicate Inference..." << std::endl;
+    std::string garm_img = params["garm_img"].get<std::string>();
+    // std::string human_img = config.img_link;
+    std::string garment_des = params["garment_des"].get<std::string>();
+    
+    std::cout << "Received data\n" << "Garment img: " << garm_img << "\nHuman img: " << config.img_link << "\nGarment des: " << garment_des;
+
+    std::string res = replicate_inference(garm_img, garment_des, config.verbose);
+    
+    // open output in browser
+    open_browser(res);
+
+    return res;
+}
 
 int main(int argc, char* argv[]){
     // parse config
