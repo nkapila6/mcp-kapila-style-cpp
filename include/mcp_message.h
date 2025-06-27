@@ -25,7 +25,8 @@ namespace mcp {
 using json = nlohmann::ordered_json;
 
 // MCP version
-constexpr const char* MCP_VERSION = "2025-03-26";
+// constexpr const char* MCP_VERSION = "2025-03-26";
+constexpr const char* MCP_VERSION = "2025-06-18";
 
 // MCP error codes (JSON-RPC 2.0 standard codes)
 enum class error_code {
