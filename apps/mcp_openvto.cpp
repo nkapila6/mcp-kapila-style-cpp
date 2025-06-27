@@ -16,6 +16,7 @@
 
 // standard headers
 #include <iostream>
+#include <fstream>
 #include <ostream>
 #include <stdexcept>
 #include <string>
@@ -48,7 +49,9 @@ struct Config{
     // local file path for csv
     std::string csv_filepath;
     // uploaded human img link for base image
+    // or use it as file path and read it in
     std::string img_link;
+    bool is_img_link_path;
 
     // verbosity
     bool verbose;
@@ -163,6 +166,13 @@ static Config parse_config(int argc, char* argv[]) {
                 std::cerr << "Error: --img-filepath requires a value" << std::endl;
                 exit(1);
             }
+        } else if (strcmp(argv[i], "--is-img-path") == 0) {
+            if (i + 1 < argc) {
+                config.is_img_link_path = parse_bool(argv[++i]);
+            } else {
+                std::cerr << "Error: --is-img-path should be either 0/1 or true/false" << std::endl;
+                exit(1);
+            }
         } else if (strcmp(argv[i], "--verbose") == 0) {
             if (i + 1 < argc) {
                 config.verbose = parse_bool(argv[++i]);
@@ -187,6 +197,7 @@ static Config parse_config(int argc, char* argv[]) {
             std::cout << "File Options:\n";
             std::cout << "  --csv_filepath <path>        Path to CSV file\n\n";
             std::cout << "  --img_link <url>                Public URL to img\n\n";
+            std::cout << "  --is-img-path <bool>             Boolean value (0/false or 1/true)\n\n";
             std::cout << "  --verbose <bool>             Boolean value (0/false or 1/true)\n\n";
             std::cout << "Other Options:\n";
             std::cout << "  --help, -h               Show this help message\n";
@@ -351,6 +362,19 @@ mcp::json replicate_handler(const mcp::json& params, const std::string& session_
     return res;
 }
 
+std::string fetch_url_from_txt(std::string path){
+    std::ifstream file(path);
+    std::string line;
+
+    if (file.is_open()){
+        if (std::getline(file, line)){
+            return line;
+        }
+    } else {
+        throw std::runtime_error("\nCannot open file or read line. Please supply correct path or use --img-link.");
+    }
+}
+
 int main(int argc, char* argv[]){
     // parse config
     config = parse_config(argc, argv);
@@ -365,6 +389,9 @@ int main(int argc, char* argv[]){
         // cannot run server if replicate key is missing
         throw std::runtime_error("\nApp is unusable with missing Replicate key for idm-vton. If you are able to run this heavy model locally, let me know or contribute for local inference. :-)");
     }
+
+    // if img link is supplied as a path
+    config.img_link = fetch_url_from_txt(config.img_link);
 
     mcp::server server("localhost", 8888);
     server.set_server_info("MCP OpenVTO in C++", "0.0.1");
