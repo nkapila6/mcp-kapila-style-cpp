@@ -291,12 +291,13 @@ auto couchbase_vector_searcher(std::string& query, int k=5, bool verbose=false){
 }
 
 // inference using replicate
-std::string replicate_inference(std::string& garm_img_link, std::string& garm_des, bool verbose){
+std::string replicate_inference(std::string& garm_img_link, std::string& garm_des, std::string& category, bool verbose){
     ri::ReplicateInference styler(config.version);
 
     styler.add_input("garm_img", garm_img_link);
     styler.add_input("human_img", config.img_link);
     styler.add_input("garment_des", garm_des);
+    styler.add_input("category", category);
 
     std::string res = styler.perform_inference(config.api_key);
     return res;
@@ -335,10 +336,14 @@ mcp::json replicate_handler(const mcp::json& params, const std::string& session_
     std::string garm_img = params["garm_img"].get<std::string>();
     // std::string human_img = config.img_link;
     std::string garment_des = params["garment_des"].get<std::string>();
+    std::string category = "upper_body"; // default
+
+    if (params["lower_body"])
+        category = "lower_body";
     
     std::cout << "Received data\n" << "Garment img: " << garm_img << "\nHuman img: " << config.img_link << "\nGarment des: " << garment_des;
 
-    std::string res = replicate_inference(garm_img, garment_des, config.verbose);
+    std::string res = replicate_inference(garm_img, garment_des, category, config.verbose);
     
     // open output in browser
     open_browser(res);
@@ -385,6 +390,8 @@ int main(int argc, char* argv[]){
     .with_description("Perform Virtual Try-On using IDM-VTON Deep Learning model. This tool is only to be called once the user has selected a garment/item to Virtual Try-On. If the user asks to call this directly without selecting a garment, kindly reject the request asking them to use either `local_search` or `couchbase_search`.")
     .with_string_param("garm_img", "The image link of the selected garment from `local_search` or `couchbase_search`", true)
     .with_string_param("garment_des", "Description of garment e.g. Short Sleeve Round Neck T-shirt from the `local_search` or `couchbase_search` selection", true)
+    .with_boolean_param("upper_body", "If the user wants to Virtually Try On the garment on the upper part of the body. If this is true, `lower_body` should be false. Both cannot be true.", true)
+    .with_boolean_param("lower_body", "If the user wants to Virtually Try On the garment on the lower part of the body. If this is true, `upper_body` should be false. Both cannot be true.", true)
     .build();
 
     // tool registry
