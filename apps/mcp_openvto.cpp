@@ -46,6 +46,9 @@ struct Config{
     std::string api_key;
     std::string version;
 
+    // replicate image outputs, save previous for regressive inference
+    std::string output_link;
+
     // local file path for csv
     std::string csv_filepath;
     // uploaded human img link for base image
@@ -327,6 +330,7 @@ std::string replicate_inference_link(std::string& human_img_link, std::string& g
 }
 
 void open_browser(std::string& link){
+    config.output_link = link; // adding previous output link during browser call
     browser::openURL(link);
 }
 
@@ -374,13 +378,37 @@ mcp::json replicate_handler(const mcp::json& params, const std::string& session_
     return res;
 }
 
+mcp::json replicate_handler_regressive(const mcp::json& params, const std::string& session_id){
+    std::cout << "Session ID: " << session_id << "\t Starting Replicate Inference RECURSIVE..." << std::endl;
+    std::string garm_img = params["garm_img"].get<std::string>();
+    // std::string human_img = config.img_link;
+    std::string garment_des = params["garment_des"].get<std::string>();
+    std::string category = "upper_body"; // default
+    std::string human_img = config.output_link;
+
+    // if (params["use_prev_output"])
+        // human_img = config.output_link;
+
+    if (params["lower_body"])
+        category = "lower_body";
+    
+    std::cout << "Received data\n" << "Garment img: " << garm_img << "\nHuman img: " << config.img_link << "\nGarment des: " << garment_des;
+
+    std::string res = replicate_inference_link(human_img, garm_img, garment_des, category, config.verbose);
+    
+    // open output in browser
+    open_browser(res);
+
+    return res;
+}
+
 mcp::json replicate_handler_link(const mcp::json& params, const std::string& session_id){
     std::cout << "Session ID: " << session_id << "\t Starting Replicate Inference RECURSIVE..." << std::endl;
     std::string garm_img = params["garm_img"].get<std::string>();
     // std::string human_img = config.img_link;
     std::string garment_des = params["garment_des"].get<std::string>();
     std::string category = "upper_body"; // default
-    std::string human_img = params["new_link"].get<std::string>();
+    std::string human_img = params["human_img"];
 
     if (params["lower_body"])
         category = "lower_body";
@@ -456,31 +484,43 @@ int main(int argc, char* argv[]){
     
     mcp::tool perform_vton_on_previous_vton = mcp::tool_builder("perform_vton_on_previous_vton")
     .with_description("Perform Virtual Try-On using IDM-VTON Deep Learning model. This tool is only to be called if the user has already performed a previous Virtual Try-On and wants to use the output of the previous try-on on another try-on. For e.g. If I already did a T-Shirt, I want to use T-Shirt output for the lower body. If the user asks to call this directly without selecting a garment, kindly reject the request asking them to use either `local_search` or `couchbase_search`.")
-    .with_string_param("new_link", "The output link from the previous `perform_vton` or `perform_vton_on_previous_vton` goes here.", true)
+    // .with_boolean_param("use_prev_output", "This should be true if the user wants to re-run inference using new garment on a previous output. The previous output link is already stored in memory.", true)
     .with_string_param("garm_img", "The image link of the selected garment from `local_search` or `couchbase_search`", true)
     .with_string_param("garment_des", "Description of garment e.g. Short Sleeve Round Neck T-shirt from the `local_search` or `couchbase_search` selection", true)
     .with_boolean_param("upper_body", "If the user wants to Virtually Try On the garment on the upper part of the body. If this is true, `lower_body` should be false. Both cannot be true.", true)
     .with_boolean_param("lower_body", "If the user wants to Virtually Try On the garment on the lower part of the body. If this is true, `upper_body` should be false. Both cannot be true.", true)
     .build();
-
+    
+    mcp::tool perform_vton_link = mcp::tool_builder("perform_vton_with_specified_link")
+    .with_description("Perform Virtual Try-On using IDM-VTON Deep Learning model. This tool is to be called if the user specifies the human image link, garment link and description.")
+    .with_string_param("human_img", "The image link of the human specified by the user.`", true)
+    .with_string_param("garm_img", "The image link of the garment specified by the user", true)
+    .with_string_param("garment_des", "Description of garment e.g. Short Sleeve Round Neck T-shirt. If not given, ask the user to give a description.", true)
+    .with_boolean_param("upper_body", "If the user wants to Virtually Try On the garment on the upper part of the body. If this is true, `lower_body` should be false. Both cannot be true.", true)
+    .with_boolean_param("lower_body", "If the user wants to Virtually Try On the garment on the lower part of the body. If this is true, `upper_body` should be false. Both cannot be true.", true)
+    .build();
+    
     // tool registry
     if (check == FunctionalityAvailability::ALL){
         server.register_tool(local_search, local_search_handler);
         server.register_tool(couchbase_search, couchbase_search_handler);
         server.register_tool(perform_vton, replicate_handler);
-        server.register_tool(perform_vton_on_previous_vton, replicate_handler_link);
+        server.register_tool(perform_vton_link, replicate_handler_link);
+        server.register_tool(perform_vton_on_previous_vton, replicate_handler_regressive);
     }
     
     if (check == FunctionalityAvailability::COUCHBASE){
         server.register_tool(couchbase_search, couchbase_search_handler);
         server.register_tool(perform_vton, replicate_handler);        
-        server.register_tool(perform_vton_on_previous_vton, replicate_handler_link);
+        server.register_tool(perform_vton_link, replicate_handler_link);
+        server.register_tool(perform_vton_on_previous_vton, replicate_handler_regressive);
     }
     
     if (check == FunctionalityAvailability::LOCAL){
         server.register_tool(local_search, local_search_handler);
         server.register_tool(perform_vton, replicate_handler);
-        server.register_tool(perform_vton_on_previous_vton, replicate_handler_link);
+        server.register_tool(perform_vton_link, replicate_handler_link);
+        server.register_tool(perform_vton_on_previous_vton, replicate_handler_regressive);
     }
 
     // Start server
