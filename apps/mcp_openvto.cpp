@@ -256,7 +256,7 @@ std::vector<double> fetch_embedding_from_query(std::string& query, bool verbose)
 }
 
 // search locally using provided .CSV
-auto local_search(const Config& config, std::string& query, bool verbose=false){
+auto local_search(std::string& query, bool verbose=false){
     // convert query to embedding
     std::vector<double> query_vec = fetch_embedding_from_query(query, verbose);
     // get datset
@@ -266,7 +266,7 @@ auto local_search(const Config& config, std::string& query, bool verbose=false){
 }
 
 // couchbase vector search
-std::string couchbase_vector_searcher(const mcp::json& params, std::string& query, std::string& field, int k=5, bool verbose=false){
+std::string couchbase_vector_searcher(std::string& query, int k=5, bool verbose=false){
     std::vector<double> query_vec = fetch_embedding_from_query(query, verbose);
 
     CouchbaseVectorSearch couchbase(config.user, 
@@ -274,8 +274,10 @@ std::string couchbase_vector_searcher(const mcp::json& params, std::string& quer
         config.bucket, config.scope, config.search_index, 
         query_vec);
 
-    std::string res = couchbase.vector_search(field, k);
-    std::cout << "Received from server:\n" << res << std::endl;
+    std::string res = couchbase.vector_search(config.search_field, k);
+    if (verbose){
+        std::cout << "Received from server:\n" << res << std::endl;
+    }
 
     return res;
 }
