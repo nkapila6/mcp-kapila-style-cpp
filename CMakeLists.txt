@@ -53,7 +53,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Eigen3)
 
 add_subdirectory(src)
-add_subdirectory(examples)
 add_subdirectory(apps)
 add_subdirectory(apps_testing)
 

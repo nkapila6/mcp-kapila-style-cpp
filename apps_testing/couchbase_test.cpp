@@ -16,8 +16,8 @@
 
 int main (){
     // random data
-    std::string hostname = "*.cloud.couchbase.com";
-    std::string search = "search_index";
+    std::string hostname = "svc-dqis-node-001.s5tkr5bxtbeozql.cloud.couchbase.com";
+    std::string search = "search_clothes";
 
     // ollama::show_requests(true);
     // ollama::show_replies(true);
@@ -28,8 +28,8 @@ int main (){
     std::vector<double> vector = data["embeddings"][0];
 
     // usr, pass, host, port, bucket_name, scope_name, idx_name, vector
-    CouchbaseVectorSearch request("user", "ayo", hostname, 18094,
-    "bucket", "scope", search, vector); //{0.25, 0.5});
+    CouchbaseVectorSearch request("aitinkerers", "AI-Tinkerers@Event11", hostname, 18094,
+    "clothes", "clothes", search, vector); //{0.25, 0.5});
 
     std::string res = request.vector_search("vector", 3);
     std::cout << res;
