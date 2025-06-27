@@ -46,8 +46,8 @@ struct Config{
 
     // local file path for csv
     std::string csv_filepath;
-    // local file path for base image
-    std::string img_filepath;
+    // uploaded human img link for base image
+    std::string img_link;
 
     // verbosity
     bool verbose;
@@ -69,7 +69,6 @@ bool parse_bool(const std::string& str) {
 
 static Config parse_config(int argc, char* argv[]) {
     Config config;
-    
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--user") == 0) {
             if (i + 1 < argc) {
@@ -156,9 +155,9 @@ static Config parse_config(int argc, char* argv[]) {
                 std::cerr << "Error: --csv_filepath requires a value" << std::endl;
                 exit(1);
             }
-        } else if (strcmp(argv[i], "--img-filepath") == 0) {
+        } else if (strcmp(argv[i], "--img-link") == 0) {
             if (i + 1 < argc) {
-                config.img_filepath = argv[++i];
+                config.img_link = argv[++i];
             } else {
                 std::cerr << "Error: --img-filepath requires a value" << std::endl;
                 exit(1);
@@ -186,7 +185,7 @@ static Config parse_config(int argc, char* argv[]) {
             std::cout << "  --version <version>      Replicate model version\n\n";
             std::cout << "File Options:\n";
             std::cout << "  --csv_filepath <path>        Path to CSV file\n\n";
-            std::cout << "  --img_filepath <path>        Path to base img file\n\n";
+            std::cout << "  --img_link <url>                Public URL to img\n\n";
             std::cout << "  --verbose <bool>             Boolean value (0/false or 1/true)\n\n";
             std::cout << "Other Options:\n";
             std::cout << "  --help, -h               Show this help message\n";
@@ -211,7 +210,7 @@ FunctionalityAvailability eval_availability(const Config& config){
 
     bool has_replicate = !config.api_key.empty() && !config.version.empty();
 
-    bool has_local_files = !config.csv_filepath.empty() && !config.img_filepath.empty();
+    bool has_local_reqs = !config.csv_filepath.empty() && !config.img_link.empty();
 
     // unusable if no access to idm-vton
     if (!has_replicate){
@@ -219,11 +218,11 @@ FunctionalityAvailability eval_availability(const Config& config){
     }
 
     // if everything available, all gud
-    if (has_couchbase && has_replicate && has_local_files){
+    if (has_couchbase && has_replicate && has_local_reqs){
         return FunctionalityAvailability::ALL;
     } else if (has_couchbase && has_replicate){ // if couchbase and replicate
         return FunctionalityAvailability::COUCHBASE;
-    } else if (has_local_files && has_replicate){ // if local nad replicate
+    } else if (has_local_reqs && has_replicate){ // if local nad replicate
         return FunctionalityAvailability::LOCAL;    
     } else {
         return FunctionalityAvailability::NEEDS_CONFIG;
