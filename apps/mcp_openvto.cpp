@@ -3,7 +3,7 @@
  * @brief MCP Server for Couchbase/Local and Replicate APIs
  * @author Nikhil Kapila
  * @date 2025-06-22 00:03:35 Sunday
- * @version 1.0.0
+ * @version 0.0.1
  *
  * Follows the 2024-11-05 basic protocol specification.
  *
@@ -354,23 +354,51 @@ int main(int argc, char* argv[]){
     }
 
     mcp::server server("localhost", 8888);
-    server.set_server_info("MCP OpenVTO in C++", "1.0.0");
+    server.set_server_info("MCP OpenVTO in C++", "0.0.1");
 
     mcp::json capabilities = {
-        {"tools", } // add tools here
+        {"tools", mcp::json::object()} // add tools here
     };
     server.set_capabilities(capabilities);
 
-    // tool registry
-    mcp::tool style_transfer = mcp::tool_builder("perform_style_transfer")
-        .with_description("")
-        .build(); // TODO need to add params
+    mcp::tool couchbase_search = mcp::tool_builder("couchbase_search")
+    .with_description("Only to be performed if the user asks to perform a search on the Cloud/Couchbase. Performs a vector search on Couchbase for a given query to find the most suitable clothes. Your job is to return the results in a readable format so the user can select which clothes to perform Virtual Try-On on.")
+    .with_string_param("query", "The refined query of the user. If it's something like Blue Jeans, ask the user for more detail and refine the query so that a more richer embedding can be used to perform a semantic search.", true)
+    .with_number_param("k", "The top-k results to fetch from semantic search (default: 5).", true)
+    .build();
+    
+    mcp::tool local_search = mcp::tool_builder("local_search")
+    .with_description("This is the default search tool to search for relevant clothes from a database of CSV file. Performs a vector search over a CSV files for a given query to find the most suitable clothes. Your job is to return the results in a readable format so the user can select which clothes to perform Virtual Try-On on.")
+    .with_string_param("query", "The refined query of the user. If it's something like Blue Jeans, ask the user for more detail and refine the query so that a more richer embedding can be used to perform a semantic search.", true)
+    .with_number_param("k", "The top-k results to fetch from semantic search (default: 5).", true)
+    .build();
 
-    // server.register_tool(style_transfer, replicate_inference);
+    mcp::tool perform_vton = mcp::tool_builder("perform_vton")
+    .with_description("Perform Virtual Try-On using IDM-VTON Deep Learning model. This tool is only to be called once the user has selected a garment/item to Virtual Try-On. If the user asks to call this directly without selecting a garment, kindly reject the request asking them to use either `local_search` or `couchbase_search`.")
+    .with_string_param("garm_img", "The image link of the selected garment from `local_search` or `couchbase_search`", true)
+    .with_string_param("garment_des", "Description of garment e.g. Short Sleeve Round Neck T-shirt from the `local_search` or `couchbase_search` selection", true)
+    .build();
+
+    // tool registry
+    if (check == FunctionalityAvailability::ALL){
+        server.register_tool(local_search, local_search_handler);
+        server.register_tool(couchbase_search, couchbase_search_handler);
+        server.register_tool(perform_vton, replicate_handler);
+    }
+    
+    if (check == FunctionalityAvailability::COUCHBASE){
+        server.register_tool(couchbase_search, couchbase_search_handler);
+        server.register_tool(perform_vton, replicate_handler);        
+    }
+    
+    if (check == FunctionalityAvailability::LOCAL){
+        server.register_tool(local_search, local_search_handler);
+        server.register_tool(perform_vton, replicate_handler);
+    }
 
     // Start server
-    std::cout << "Starting MCP server at localhost:8888..." << std::endl;
-    std::cout << "Press Ctrl+C to stop the server" << std::endl;
+    // std::cout << "Starting MCP server at localhost:8888..." << std::endl;
+    // std::cout << "Press Ctrl+C to stop the server" << std::endl;
     server.start(true);  // Blocking mode
 
     return 0;
